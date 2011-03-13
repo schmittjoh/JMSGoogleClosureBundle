@@ -69,7 +69,7 @@ class BuildPlovrCommand extends BaseCommand
         }
 
         $path = $this->writeTempConfig($config);
-        $this->runJar($output, $javaBin, $plovrJar, 'build '.escapeshellarg($tempFile).' > '.escapeshellarg($outputFile));
-        unlink($tempFile);
+        $this->runJar($output, $javaBin, $plovrJar, 'build '.escapeshellarg($path).' > '.escapeshellarg($outputFile));
+        unlink($path);
     }
 }
