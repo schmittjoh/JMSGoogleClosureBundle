@@ -1,10 +1,26 @@
 <?php
 
+/*
+ * Copyright 2011 Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 namespace JMS\GoogleClosureBundle\Command;
 
+use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -15,7 +31,7 @@ use Symfony\Component\Console\Input\InputArgument;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class BuildPlovrCommand extends Command
+class BuildPlovrCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -23,85 +39,37 @@ class BuildPlovrCommand extends Command
             ->setName('plovr:build')
             ->setDescription('Builds a Javascript app using the Plovr server')
             ->addArgument('config', InputArgument::REQUIRED, 'The configuration file to use.')
-            ->addArgument('output', InputArgument::REQUIRED, 'Where to put the file.')
-            ->addOption('java-bin')
-            ->addOption('plovr-jar')
         ;
+
+        parent::configure();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $javaBin = $input->getOption('java-bin');
-        if (empty($javaBin)) {
-            $javaBin = $this->detectJavaBin();
+        $javaBin = $this->locateJavaBin($input);
+        $plovrJar = $this->locatePlovrJar($input);
+        $config = $this->loadPlovrConfig($input->getArgument('config'));
+
+        if (!isset($config['output-file'])) {
+            throw new \RuntimeException('You must specify "output-file" in your plovr configuration file.');
+        }
+        if (!is_string($config['output-file'])) {
+            throw new \RuntimeException('"output-file" must be a string.');
+        }
+        $outputFile = $this->normalizePath($config['output-file']);
+
+        $dir = dirname($outputFile);
+        if (!file_exists($dir)) {
+            $output->writeln(sprintf('Creating output directory "%s"...', $dir));
+            @mkdir($dir, 0777, true);
         }
 
-        if (!file_exists($javaBin) || !is_executable($javaBin)) {
-            throw new \RuntimeException(sprintf('"%s" does not exist, or cannot be executed.', $javaBin));
+        if (!is_writable($dir)) {
+            throw new \RuntimeException(sprintf('Output path "%s" is not writable.', $dir));
         }
 
-        $plovrJar = $input->getOption('plovr-jar');
-        if (empty($plovrJar)) {
-            $plovrJar = realpath(__DIR__.'/../../../../vendor/plovr/plovr.jar');
-        }
-
-        if (!file_exists($plovrJar)) {
-            throw new \RuntimeException(sprintf('The plovr jar "%s" does not exist.', $plovrJar));
-        }
-
-        $config = $input->getArgument('config');
-        if (!file_exists($config)) {
-            throw new \RuntimeException(sprintf('The config file "%s" does not exist.', $config));
-        }
-
-        $outputFile = $input->getArgument('output');
-
-        $cmd = escapeshellarg($javaBin).' -jar '.escapeshellarg($plovrJar).' build '.escapeshellarg($config).' > '.escapeshellarg($outputFile);
-
-        // fixes a seemingly broken C implementation of the proc_open command
-        // see: http://coding.derkeiler.com/Archive/PHP/comp.lang.php/2005-01/1724.html
-        if (stripos(PHP_OS, 'win') === 0) {
-            $cmd = 'cmd /C "'.$cmd.'"';
-        }
-
-        $output->writeln(sprintf('Executing "%s"...', $cmd));
-        $h = proc_open($cmd, $descriptorspec = array(
-            0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-            1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-            2 => array("pipe", "w") // stderr is a file to write to
-        ), $pipes);
-
-        fclose($pipes[0]);
-
-        while (!feof($pipes[2])) {
-            $output->writeln('Error: '.fgets($pipes[2]));
-        }
-        fclose($pipes[2]);
-
-        while (!feof($pipes[1])) {
-            $output->writeln(fgets($pipes[1]));
-        }
-        fclose($pipes[1]);
-    }
-
-    private function detectJavaBin()
-    {
-        $path = getenv('PATH') ? getenv('PATH') : getenv('Path');
-        $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ? explode(PATH_SEPARATOR, getenv('PATHEXT')) : array('.exe', '.bat', '.cmd', '.com')) : array('');
-        foreach (array('java') as $cli)
-        {
-            foreach ($suffixes as $suffix)
-            {
-                foreach (explode(PATH_SEPARATOR, $path) as $dir)
-                {
-                    if (is_file($file = $dir.DIRECTORY_SEPARATOR.$cli.$suffix) && is_executable($file))
-                    {
-                        return $file;
-                    }
-                }
-            }
-        }
-
-        throw new RuntimeException('Unable to find Java executable.');
+        $path = $this->writeTempConfig($config);
+        $this->runJar($output, $javaBin, $plovrJar, 'build '.escapeshellarg($tempFile).' > '.escapeshellarg($outputFile));
+        unlink($tempFile);
     }
 }
