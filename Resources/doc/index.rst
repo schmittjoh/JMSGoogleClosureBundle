@@ -2,7 +2,7 @@
 Overview
 ========
 
-This bundle eases development with the "Google Closure Tools"_ by providing
+This bundle eases development with the `Google Closure Tools`_ by providing
 some useful command line tools.
 
 
@@ -21,11 +21,11 @@ Then register the bundle with your kernel::
         // ...
     );
 
-You also need to download the plovr.jar file from:
+You also need to download the plovr.jar file from::
 
     http://code.google.com/p/plovr/downloads/list
     
-Plovr_ is a lightweight wrapper around the Google Closure Tools_ (Compiler, Library,
+Plovr_ is a lightweight wrapper around the `Google Closure Tools`_ (Compiler, Library,
 and Templates).
 
 
@@ -48,7 +48,7 @@ Running plovr during development
 
 Plovr by default listens on port 9810, and will automatically compile your
 application when a request comes in. To start plovr, you first have to create
-a "plovr configuration"_ file. Plovr configuration files are simple Javascript
+a `plovr configuration`_ file. Plovr configuration files are simple Javascript
 object literals. It's important that you place this file somewhere below
 ``Resources/config/plovr/`` in your bundle::
 
@@ -65,13 +65,13 @@ object literals. It's important that you place this file somewhere below
         "debug": true
     }
     
-After you have set-up the configuration file, you can run Plovr by running:
+After you have set-up the configuration file, you can run Plovr by running::
 
-    ``php app/console plovr:start @MyBundle/compile.js``
+    php app/console plovr:start @MyBundle/compile.js
     
-Your Javascript source code will now be compiled upon request, and is available at:
+Your Javascript source code will now be compiled upon request, and is available at::
 
-    ``http://localhost:9810/compile?id=some-unique-id``
+    http://localhost:9810/compile?id=some-unique-id
 
 
 Compiling for production
@@ -110,6 +110,6 @@ You can then compile your Javascript application using the following command::
     php app/console plovr:build @MyBundle/build.js
 
 
-.. _Google Closure Tools: http://code.google.com/closure/
+.. _`Google Closure Tools`: http://code.google.com/closure/
 .. _Plovr: http://plovr.com/
-.. _plovr configuration: http://plovr.com/options.html
+.. _`plovr configuration`: http://plovr.com/options.html
