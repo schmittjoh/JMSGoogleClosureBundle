@@ -2,7 +2,7 @@
 Overview
 ========
 
-This bundle eases development with the Google Closure Tools_ by providing
+This bundle eases development with the "Google Closure Tools"_ by providing
 some useful command line tools.
 
 
@@ -32,6 +32,9 @@ and Templates).
 Configuration
 -------------
 
+Below is the default configuration, you only need to change it if you want to
+place plovr somewhere else::
+
     jms_google_closure:
         plovr:
             jar_path: %kernel.root_dir%/vendor/plovr/plovr.jar
@@ -45,9 +48,9 @@ Running plovr during development
 
 Plovr by default listens on port 9810, and will automatically compile your
 application when a request comes in. To start plovr, you first have to create
-a plovr configuration_ file. Plovr configuration files are simple Javascript
+a "plovr configuration"_ file. Plovr configuration files are simple Javascript
 object literals. It's important that you place this file somewhere below
-``Resources/cofig/plovr/`` in your bundle::
+``Resources/config/plovr/`` in your bundle::
 
     // Resources/config/plovr/compile.js
     {
@@ -64,11 +67,11 @@ object literals. It's important that you place this file somewhere below
     
 After you have set-up the configuration file, you can run Plovr by running:
 
-    php app/console plovr:start @MyBundle/compile.js
+    ``php app/console plovr:start @MyBundle/compile.js``
     
-Your compiled Javascript will now be compiled upon request, and is available at:
+Your Javascript source code will now be compiled upon request, and is available at:
 
-    http://localhost:9810/compile?id=some-unique-id
+    ``http://localhost:9810/compile?id=some-unique-id``
 
 
 Compiling for production
@@ -107,6 +110,6 @@ You can then compile your Javascript application using the following command::
     php app/console plovr:build @MyBundle/build.js
 
 
-.. Google Closure Tools: http://code.google.com/closure/
-.. Plovr: http://plovr.com/
-.. plovr configuration: http://plovr.com/options.html
+.. _Google Closure Tools: http://code.google.com/closure/
+.. _Plovr: http://plovr.com/
+.. _plovr configuration: http://plovr.com/options.html
