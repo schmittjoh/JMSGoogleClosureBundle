@@ -43,10 +43,14 @@ class JMSGoogleClosureExtension extends Extension
         $tb = new TreeBuilder();
 
         return $tb
-            ->root('jms_google_closure', 'array')
-                ->arrayNode('plovr')
-                    ->addDefaultsIfNotSet()
-                    ->scalarNode('jar_path')->defaultValue('%kernel.root_dir%/../vendor/plovr/plovr.jar')->end()
+            ->root('jms_google_closure')
+                ->children()
+                    ->arrayNode('plovr')
+                        ->addDefaultsIfNotSet()
+                        ->children()
+                            ->scalarNode('jar_path')->defaultValue('%kernel.root_dir%/../vendor/plovr/plovr.jar')->end()
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
             ->buildTree();
