@@ -18,6 +18,7 @@
 
 namespace JMS\GoogleClosureBundle\Command;
 
+use JMS\GoogleClosureBundle\Exception\RuntimeException;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
@@ -51,10 +52,10 @@ class BuildPlovrCommand extends BaseCommand
         $config = $this->loadPlovrConfig($input->getArgument('config'));
 
         if (!isset($config['output-file'])) {
-            throw new \RuntimeException('You must specify "output-file" in your plovr configuration file.');
+            throw new RuntimeException('You must specify "output-file" in your plovr configuration file.');
         }
         if (!is_string($config['output-file'])) {
-            throw new \RuntimeException('"output-file" must be a string.');
+            throw new RuntimeException('"output-file" must be a string.');
         }
         $outputFile = $this->normalizePath($config['output-file']);
 
@@ -65,7 +66,7 @@ class BuildPlovrCommand extends BaseCommand
         }
 
         if (!is_writable($dir)) {
-            throw new \RuntimeException(sprintf('Output path "%s" is not writable.', $dir));
+            throw new RuntimeException(sprintf('Output path "%s" is not writable.', $dir));
         }
 
         $path = $this->writeTempConfig($config);

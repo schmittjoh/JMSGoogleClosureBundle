@@ -18,6 +18,7 @@
 
 namespace JMS\GoogleClosureBundle\Command;
 
+use JMS\GoogleClosureBundle\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\Command;
@@ -52,7 +53,7 @@ abstract class BaseCommand extends Command
         $config = json_decode(file_get_contents($file), true);
 
         if (null === $config) {
-            throw new \RuntimeException(sprintf('Invalid plovr configuration "%s".', $file));
+            throw new RuntimeException(sprintf('Invalid plovr configuration "%s".', $file));
         }
 
         return $config;
@@ -66,7 +67,7 @@ abstract class BaseCommand extends Command
         }
 
         if (!file_exists($javaBin) || !is_executable($javaBin)) {
-            throw new \RuntimeException(sprintf('Java binary "%s" does not exist, or cannot be executed.', $javaBin));
+            throw new RuntimeException(sprintf('Java binary "%s" does not exist, or cannot be executed.', $javaBin));
         }
 
         return realpath($javaBin);
@@ -80,7 +81,7 @@ abstract class BaseCommand extends Command
         }
 
         if (!file_exists($plovrJar) || !is_readable($plovrJar)) {
-            throw new \RuntimeException(sprintf('The plovr jar "%s" does not exist, or is not readable.', $plovrJar));
+            throw new RuntimeException(sprintf('The plovr jar "%s" does not exist, or is not readable.', $plovrJar));
         }
 
         return realpath($plovrJar);
@@ -176,7 +177,7 @@ abstract class BaseCommand extends Command
         }
 
         if (!file_exists($path) || !is_readable($path)) {
-            throw new \RuntimeException(sprintf('Plovr configuration file "%s" does not exist, or is not readable.', $path));
+            throw new RuntimeException(sprintf('Plovr configuration file "%s" does not exist, or is not readable.', $path));
         }
 
         return $path;
