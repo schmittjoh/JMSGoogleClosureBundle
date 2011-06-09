@@ -90,23 +90,15 @@ abstract class BaseCommand extends Command
     protected function normalizeConfig(array $config)
     {
         if (isset($config['paths'])) {
-            if (is_string($config['paths'])) {
-                $config['paths'] = array($config['paths']);
-            }
-
-            foreach ($config['paths'] as $k => $path) {
-                $config['paths'][$k] = $this->normalizePath($path);
-            }
+            $config['paths'] = $this->normalizePaths($config['paths']);
         }
 
         if (isset($config['inputs'])) {
-            if (is_string($config['inputs'])) {
-                $config['inputs'] = array($config['inputs']);
-            }
+            $config['inputs'] = $this->normalizePaths($config['inputs']);
+        }
 
-            foreach ($config['inputs'] as $k => $path) {
-                $config['inputs'][$k] = $this->normalizePath($path);
-            }
+        if (isset($config['externs'])) {
+            $config['externs'] = $this->normalizePaths($config['externs']);
         }
 
         if (isset($config['output-file'])) {
@@ -114,6 +106,16 @@ abstract class BaseCommand extends Command
         }
 
         return $config;
+    }
+
+    protected function normalizePaths($input)
+    {
+        $input = (array) $input;
+        foreach ($input as $k => $v) {
+            $input[$k] = $this->normalizePath($v);
+        }
+
+        return $input;
     }
 
     protected function normalizePath($str)
