@@ -129,6 +129,12 @@ abstract class BaseCommand extends Command
             $path = $str;
         }
 
+        // replace parameters
+        $container = $this->container;
+        $path = preg_replace_callback('/%((?:[^%]|%%)*)%/', function($match) use ($container) {
+            return $container->getParameter($match[1]);
+        }, $path);
+
         return $path;
     }
 
