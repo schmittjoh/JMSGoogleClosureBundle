@@ -18,17 +18,17 @@
 
 namespace JMS\GoogleClosureBundle\Command;
 
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use JMS\GoogleClosureBundle\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\Command;
 
 /**
  * BaseCommand.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-abstract class BaseCommand extends Command
+abstract class BaseCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
