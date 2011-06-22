@@ -77,7 +77,7 @@ abstract class BaseCommand extends ContainerAwareCommand
     {
         $plovrJar = $input->getOption('plovr-jar');
         if (empty($plovrJar)) {
-            $plovrJar = $this->container->getParameter('jms.google_closure.plovr.jar_path');
+            $plovrJar = $this->getContainer()->getParameter('jms.google_closure.plovr.jar_path');
         }
 
         if (!file_exists($plovrJar) || !is_readable($plovrJar)) {
@@ -123,14 +123,14 @@ abstract class BaseCommand extends ContainerAwareCommand
         if ('@' === $str[0]) {
             list($bundle, $subPath) = explode('/', $str, 2);
 
-            $path = $this->container->get('kernel')->getBundle(substr($bundle, 1))->getPath();
+            $path = $this->getContainer()->get('kernel')->getBundle(substr($bundle, 1))->getPath();
             $path .= '/'.$subPath;
         } else {
             $path = $str;
         }
 
         // replace parameters
-        $container = $this->container;
+        $container = $this->getContainer();
         $path = preg_replace_callback('/%((?:[^%]|%%)*)%/', function($match) use ($container) {
             return $container->getParameter($match[1]);
         }, $path);
@@ -172,7 +172,7 @@ abstract class BaseCommand extends ContainerAwareCommand
     {
         if ('@' === $inputStr[0]) {
             $bundle = substr($inputStr, 1, ($pos = strpos($inputStr, '/'))-1);
-            $path = $this->container->get('kernel')->getBundle($bundle)->getPath();
+            $path = $this->getContainer()->get('kernel')->getBundle($bundle)->getPath();
 
             $subPath = substr($inputStr, $pos);
             if (0 !== strpos($subPath, '/Resources/')) {
