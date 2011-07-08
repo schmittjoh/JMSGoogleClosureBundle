@@ -50,6 +50,7 @@ class BuildPlovrCommand extends BaseCommand
         $javaBin = $this->locateJavaBin($input);
         $plovrJar = $this->locatePlovrJar($input);
         $config = $this->loadPlovrConfig($input->getArgument('config'));
+        $translator = $this->getContainer()->get('translator');
 
         if (!isset($config['output-file'])) {
             throw new RuntimeException('You must specify "output-file" in your plovr configuration file.');
@@ -59,18 +60,40 @@ class BuildPlovrCommand extends BaseCommand
         }
         $outputFile = $this->normalizePath($config['output-file']);
 
-        $dir = dirname($outputFile);
-        if (!file_exists($dir)) {
-            $output->writeln(sprintf('Creating output directory "%s"...', $dir));
-            @mkdir($dir, 0777, true);
+        if (!isset($config['locales'])) {
+            $locales = array('en');
+        } else if (!is_array($config['locales'])) {
+            throw new RuntimeException('"locales" must be an array of strings.');
+        } else {
+            $locales = $config['locales'];
+            unset($config['locales']);
         }
 
-        if (!is_writable($dir)) {
-            throw new RuntimeException(sprintf('Output path "%s" is not writable.', $dir));
-        }
+        foreach ($locales as $locale) {
+            $localeOutputFile = str_replace('$locale', $locale, $outputFile);
+            $dir = dirname($localeOutputFile);
+            if (!file_exists($dir)) {
+                $output->writeln(sprintf('Creating output directory "%s"...', $dir));
+                @mkdir($dir, 0777, true);
+            }
 
-        $path = $this->writeTempConfig($config);
-        $this->runJar($output, $javaBin, $plovrJar, 'build '.escapeshellarg($path).' > '.escapeshellarg($outputFile));
-        unlink($path);
+            if (!is_writable($dir)) {
+                throw new RuntimeException(sprintf('Output path "%s" is not writable.', $dir));
+            }
+
+            $localeConfig = $config;
+            $localeConfig['define']['goog.LOCALE'] = $locale;
+            foreach ($localeConfig['define'] as $k => $v) {
+                if (!preg_match('/\.MSG_[A-Z_0-9]+$/', $k)) {
+                    continue;
+                }
+
+                $localeConfig['define'][$k] = $translator->trans($v, array(), 'messages', $locale);
+            }
+
+            $path = $this->writeTempConfig($localeConfig);
+            $this->runJar($output, $javaBin, $plovrJar, 'build '.escapeshellarg($path).' > '.escapeshellarg($localeOutputFile));
+            unlink($path);
+        }
     }
 }
