@@ -59,6 +59,7 @@ class BuildPlovrCommand extends BaseCommand
             throw new RuntimeException('"output-file" must be a string.');
         }
         $outputFile = $this->normalizePath($config['output-file']);
+        unset($config['output-file']);
 
         if (!isset($config['locales'])) {
             $locales = array('en');
@@ -68,6 +69,11 @@ class BuildPlovrCommand extends BaseCommand
             $locales = $config['locales'];
             unset($config['locales']);
         }
+
+        $localeSpecificVariableMap = isset($config['variable-map-output-path']) && false !== strpos($config['variable-map-input-path'], '$locale');
+        $localeSpecificPropertyMap = isset($config['property-map-output-path']) && false !== strpos($config['property-map-output-path'], '$locale');
+        $variableMapInputPath = isset($config['variable-map-input-path']) ? $this->normalizePath($config['variable-map-input-path']) : null;
+        $propertyMapInputPath = isset($config['property-map-input-path']) ? $this->normalizePath($config['property-map-input-path']) : null;
 
         foreach ($locales as $locale) {
             $localeOutputFile = str_replace('$locale', $locale, $outputFile);
@@ -83,12 +89,36 @@ class BuildPlovrCommand extends BaseCommand
 
             $localeConfig = $config;
             $localeConfig['define']['goog.LOCALE'] = $locale;
+
+            // set translations (any constants which start with MSG_ are considered for translation)
             foreach ($localeConfig['define'] as $k => $v) {
                 if (!preg_match('/\.MSG_[A-Z_0-9]+$/', $k)) {
                     continue;
                 }
 
                 $localeConfig['define'][$k] = $translator->trans($v, array(), 'messages', $locale);
+            }
+
+            if (null !== $variableMapInputPath) {
+                $localeConfig['variable-map-input-path'] = $variableMapInputPath;
+            }
+            if (null !== $propertyMapInputPath) {
+                $localeConfig['property-map-input-path'] = $propertyMapInputPath;
+            }
+
+            if (isset($localeConfig['variable-map-output-path'])) {
+                $localeConfig['variable-map-output-path'] = str_replace('$locale', $locale, $localeConfig['variable-map-output-path']);
+
+                if (!$localeSpecificVariableMap) {
+                    $variableMapInputPath = $localeConfig['variable-map-output-path'];
+                }
+            }
+            if (isset($localeConfig['property-map-output-path'])) {
+                $localeConfig['property-map-output-path'] = str_replace('$locale', $locale, $localeConfig['property-map-output-path']);
+
+                if (!$localeSpecificPropertyMap) {
+                    $propertyMapInputPath = $localeConfig['property-map-output-path'];
+                }
             }
 
             $path = $this->writeTempConfig($localeConfig);

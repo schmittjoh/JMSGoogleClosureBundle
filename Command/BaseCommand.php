@@ -40,7 +40,6 @@ abstract class BaseCommand extends ContainerAwareCommand
 
     protected function writeTempConfig(array $config)
     {
-        $config = $this->normalizeConfig($config);
         $tempFile = tempnam(sys_get_temp_dir(), 'config');
         file_put_contents($tempFile, json_encode($config));
 
@@ -55,6 +54,8 @@ abstract class BaseCommand extends ContainerAwareCommand
         if (null === $config) {
             throw new RuntimeException(sprintf('Invalid plovr configuration "%s".', $file));
         }
+
+        $config = $this->normalizeConfig($config);
 
         return $config;
     }
@@ -101,8 +102,25 @@ abstract class BaseCommand extends ContainerAwareCommand
             $config['externs'] = $this->normalizePaths($config['externs']);
         }
 
-        if (isset($config['output-file'])) {
-            unset($config['output-file']);
+        if (isset($config['variable-map-output-path'])) {
+            $config['variable-map-output-path'] = $this->normalizePath($config['variable-map-output-path']);
+
+            $dir = dirname($config['variable-map-output-path']);
+            if (!file_exists($dir)) {
+                if (false === @mkdir($dir, 0777, true)) {
+                    throw new \RuntimeException(sprintf('Could not create variable map output directory "%s".', $dir));
+                }
+            }
+        }
+        if (isset($config['property-map-output-path'])) {
+            $config['property-map-output-path'] = $this->normalizePath($config['property-map-output-path']);
+
+            $dir = dirname($config['property-map-output-path']);
+            if (!file_exists($dir)) {
+                if (false === @mkdir($dir, 0777, true)) {
+                    throw new \RuntimeException(sprintf('Could not create property map output directory "%s".', $dir));
+                }
+            }
         }
 
         return $config;
