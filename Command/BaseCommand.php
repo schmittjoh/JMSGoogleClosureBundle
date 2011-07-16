@@ -18,6 +18,8 @@
 
 namespace JMS\GoogleClosureBundle\Command;
 
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use JMS\GoogleClosureBundle\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -100,6 +102,10 @@ abstract class BaseCommand extends ContainerAwareCommand
 
         if (isset($config['externs'])) {
             $config['externs'] = $this->normalizePaths($config['externs']);
+        }
+
+        if (isset($config['define'])) {
+            $config['define'] = $this->getContainer()->getParameterBag()->resolveValue($config['define']);
         }
 
         if (isset($config['variable-map-output-path'])) {
