@@ -108,6 +108,10 @@ abstract class BaseCommand extends ContainerAwareCommand
             $config['define'] = $this->getContainer()->getParameterBag()->resolveValue($config['define']);
         }
 
+        if (isset($config['locales'])) {
+            $config['locales'] = $this->getContainer()->getParameterBag()->resolveValue($config['locales']);
+        }
+
         if (isset($config['variable-map-output-path'])) {
             $config['variable-map-output-path'] = $this->normalizePath($config['variable-map-output-path']);
 
