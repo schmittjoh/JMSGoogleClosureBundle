@@ -18,6 +18,8 @@
 
 namespace JMS\GoogleClosureBundle\Command;
 
+use Symfony\Component\Routing\RequestContext;
+use JMS\I18nRoutingBundle\Router\I18nRouter;
 use JMS\GoogleClosureBundle\Exception\RuntimeException;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -51,6 +53,7 @@ class BuildPlovrCommand extends BaseCommand
         $plovrJar = $this->locatePlovrJar($input);
         $config = $this->loadPlovrConfig($input->getArgument('config'));
         $translator = $this->getContainer()->get('translator');
+        $router = $this->getContainer()->get('router');
 
         if (!isset($config['output-file'])) {
             throw new RuntimeException('You must specify "output-file" in your plovr configuration file.');
@@ -92,11 +95,19 @@ class BuildPlovrCommand extends BaseCommand
 
             // set translations (any constants which start with MSG_ are considered for translation)
             foreach ($localeConfig['define'] as $k => $v) {
-                if (!preg_match('/\.MSG_[A-Z_0-9]+$/', $k)) {
+                if (!preg_match('/\.(MSG|ROUTE)_[A-Z_0-9]+$/', $k, $match)) {
                     continue;
                 }
 
-                $localeConfig['define'][$k] = $translator->trans($v, array(), 'messages', $locale);
+                if ('MSG' === $match[1]) {
+                    $localeConfig['define'][$k] = $translator->trans($v, array(), 'messages', $locale);
+                } else if ('ROUTE' === $match[1]) {
+                    $requestContext = new RequestContext();
+                    $requestContext->setParameter('_locale', $locale);
+                    $router->setContext($requestContext);
+
+                    $localeConfig['define'][$k] = $router->generate($v);
+                }
             }
 
             if (null !== $variableMapInputPath) {
