@@ -36,6 +36,12 @@ class JMSGoogleClosureExtension extends Extension
         $config = $processor->process($this->getConfigTree(), $configs);
 
         $container->setParameter('jms.google_closure.plovr.jar_path', $config['plovr']['jar_path']);
+
+        $container
+            ->register('jms_google_closure.translation_extractor', 'JMS\GoogleClosureBundle\Translation\GoogleClosureTranslationExtractor')
+            ->addTag('translation.extractor', array('alias' => 'google_closure'))
+            ->setPublic(false)
+        ;
     }
 
     private function getConfigTree()
