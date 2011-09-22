@@ -73,10 +73,10 @@ class BuildPlovrCommand extends BaseCommand
             unset($config['locales']);
         }
 
-        $localeSpecificVariableMap = isset($config['variable-map-output-path']) && false !== strpos($config['variable-map-input-path'], '$locale');
-        $localeSpecificPropertyMap = isset($config['property-map-output-path']) && false !== strpos($config['property-map-output-path'], '$locale');
-        $variableMapInputPath = isset($config['variable-map-input-path']) ? $this->normalizePath($config['variable-map-input-path']) : null;
-        $propertyMapInputPath = isset($config['property-map-input-path']) ? $this->normalizePath($config['property-map-input-path']) : null;
+        $localeSpecificVariableMap = isset($config['variable-map-output-file']) && false !== strpos($config['variable-map-input-file'], '$locale');
+        $localeSpecificPropertyMap = isset($config['property-map-output-file']) && false !== strpos($config['property-map-output-file'], '$locale');
+        $variableMapInputPath = isset($config['variable-map-input-file']) ? $this->normalizePath($config['variable-map-input-file']) : null;
+        $propertyMapInputPath = isset($config['property-map-input-file']) ? $this->normalizePath($config['property-map-input-file']) : null;
 
         foreach ($locales as $locale) {
             $localeOutputFile = str_replace('$locale', $locale, $outputFile);
@@ -111,24 +111,24 @@ class BuildPlovrCommand extends BaseCommand
             }
 
             if (null !== $variableMapInputPath) {
-                $localeConfig['variable-map-input-path'] = $variableMapInputPath;
+                $localeConfig['variable-map-input-file'] = $variableMapInputPath;
             }
             if (null !== $propertyMapInputPath) {
-                $localeConfig['property-map-input-path'] = $propertyMapInputPath;
+                $localeConfig['property-map-input-file'] = $propertyMapInputPath;
             }
 
-            if (isset($localeConfig['variable-map-output-path'])) {
-                $localeConfig['variable-map-output-path'] = str_replace('$locale', $locale, $localeConfig['variable-map-output-path']);
+            if (isset($localeConfig['variable-map-output-file'])) {
+                $localeConfig['variable-map-output-path'] = str_replace('$locale', $locale, $localeConfig['variable-map-output-file']);
 
                 if (!$localeSpecificVariableMap) {
-                    $variableMapInputPath = $localeConfig['variable-map-output-path'];
+                    $variableMapInputPath = $localeConfig['variable-map-output-file'];
                 }
             }
-            if (isset($localeConfig['property-map-output-path'])) {
-                $localeConfig['property-map-output-path'] = str_replace('$locale', $locale, $localeConfig['property-map-output-path']);
+            if (isset($localeConfig['property-map-output-file'])) {
+                $localeConfig['property-map-output-file'] = str_replace('$locale', $locale, $localeConfig['property-map-output-file']);
 
                 if (!$localeSpecificPropertyMap) {
-                    $propertyMapInputPath = $localeConfig['property-map-output-path'];
+                    $propertyMapInputPath = $localeConfig['property-map-output-file'];
                 }
             }
 

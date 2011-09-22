@@ -19,7 +19,6 @@
 namespace JMS\GoogleClosureBundle\Command;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use JMS\GoogleClosureBundle\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -112,20 +111,20 @@ abstract class BaseCommand extends ContainerAwareCommand
             $config['locales'] = $this->getContainer()->getParameterBag()->resolveValue($config['locales']);
         }
 
-        if (isset($config['variable-map-output-path'])) {
-            $config['variable-map-output-path'] = $this->normalizePath($config['variable-map-output-path']);
+        if (isset($config['variable-map-output-file'])) {
+            $config['variable-map-output-file'] = $this->normalizePath($config['variable-map-output-file']);
 
-            $dir = dirname($config['variable-map-output-path']);
+            $dir = dirname($config['variable-map-output-file']);
             if (!file_exists($dir)) {
                 if (false === @mkdir($dir, 0777, true)) {
                     throw new \RuntimeException(sprintf('Could not create variable map output directory "%s".', $dir));
                 }
             }
         }
-        if (isset($config['property-map-output-path'])) {
-            $config['property-map-output-path'] = $this->normalizePath($config['property-map-output-path']);
+        if (isset($config['property-map-output-file'])) {
+            $config['property-map-output-file'] = $this->normalizePath($config['property-map-output-file']);
 
-            $dir = dirname($config['property-map-output-path']);
+            $dir = dirname($config['property-map-output-file']);
             if (!file_exists($dir)) {
                 if (false === @mkdir($dir, 0777, true)) {
                     throw new \RuntimeException(sprintf('Could not create property map output directory "%s".', $dir));
