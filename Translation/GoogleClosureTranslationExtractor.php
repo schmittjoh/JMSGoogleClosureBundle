@@ -2,35 +2,35 @@
 
 namespace JMS\GoogleClosureBundle\Translation;
 
-use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Translation\Extractor\ExtractorInterface;
+use JMS\TranslationBundle\Model\FileSource;
+use JMS\TranslationBundle\Model\Message;
+use JMS\TranslationBundle\Model\MessageCatalogue;
+use JMS\TranslationBundle\Translation\Extractor\FileVisitorInterface;
 
-class GoogleClosureTranslationExtractor implements ExtractorInterface
+class GoogleClosureTranslationExtractor implements FileVisitorInterface
 {
-    private $prefix = '';
-
-    public function extract($directory, MessageCatalogue $catalogue)
+    public function visitFile(\SplFileInfo $file, MessageCatalogue $catalogue)
     {
-        foreach (Finder::create()->name('*.js')->in($directory)->files() as $file) {
-            $content = json_decode(file_get_contents($file), true);
+        if ('.js' !== substr($file, -3)) {
+            return;
+        }
 
-            if (null === $content || !is_array($content) || !isset($content['define'])) {
+        $content = json_decode(file_get_contents($file), true);
+        if (null === $content || !is_array($content) || !isset($content['define'])) {
+            return;
+        }
+
+        foreach ($content['define'] as $k => $id) {
+            if (!preg_match('/(^|\.)MSG_[^.]+$/', $k)) {
                 continue;
             }
 
-            foreach ($content['define'] as $k => $id) {
-                if (!preg_match('/(^|\.)MSG_[^.]+$/', $k)) {
-                    continue;
-                }
-
-                $catalogue->set($this->prefix.$id, $id, 'messages');
-            }
+            $message = new Message($id);
+            $message->addSource(new FileSource((string) $file));
+            $catalogue->add($message);
         }
     }
 
-    public function setPrefix($prefix)
-    {
-        $this->prefix = $prefix;
-    }
+    public function visitPhpFile(\SplFileInfo $file, MessageCatalogue $catalogue, array $ast) { }
+    public function visitTwigFile(\SplFileInfo $file, MessageCatalogue $catalogue, \Twig_Node $node) { }
 }

@@ -39,7 +39,7 @@ class JMSGoogleClosureExtension extends Extension
 
         $container
             ->register('jms_google_closure.translation_extractor', 'JMS\GoogleClosureBundle\Translation\GoogleClosureTranslationExtractor')
-            ->addTag('translation.extractor', array('alias' => 'google_closure'))
+            ->addTag('jms_translation.file_visitor')
             ->setPublic(false)
         ;
     }
