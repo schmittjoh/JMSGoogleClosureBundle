@@ -10,7 +10,7 @@ Installation
 ------------
 Checkout a copy of the code::
 
-    git submodule add https://github.com/schmittjoh/GoogleClosureBundle.git src/JMS/GoogleClosureBundle
+    git submodule add https://github.com/schmittjoh/JMSGoogleClosureBundle.git src/JMS/GoogleClosureBundle
     
 Then register the bundle with your kernel::
 
