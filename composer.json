@@ -1,0 +1,21 @@
+{
+    "name": "jms/google-closure-bundle",
+    "description": "Eases development with the Google Closure Tools in Symfony2",
+    "homepage": "http://jmsyst.com/bundles/JMSGoogleClosureBundle",
+    "type": "symfony-bundle",
+    "license": "Apache2",
+    "authors": [
+        {
+            "name": "Johannes M. Schmitt",
+            "email": "schmittjoh@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "symfony/framework-bundle": ">=2.0,<3.0"
+    },
+    "autoload": {
+        "psr-0": { "JMS\\GoogleClosureBundle": "" }
+    },
+    "target-dir": "JMS/GoogleClosureBundle"
+}
