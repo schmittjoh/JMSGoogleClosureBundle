@@ -18,7 +18,6 @@
 
 namespace JMS\GoogleClosureBundle\Command;
 
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use JMS\GoogleClosureBundle\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -47,6 +46,9 @@ abstract class BaseCommand extends ContainerAwareCommand
         return $tempFile;
     }
 
+    /**
+     * @return array
+     */
     protected function loadPlovrConfig($file)
     {
         $file = $this->locatePlovrConfig($file);
@@ -165,6 +167,11 @@ abstract class BaseCommand extends ContainerAwareCommand
         return $path;
     }
 
+    /**
+     * @param string      $javaBin
+     * @param string      $jarPath
+     * @param string|null $args
+     */
     protected function runJar(OutputInterface $output, $javaBin, $jarPath, $args = null)
     {
         $cmd = escapeshellarg($javaBin).' -jar '.escapeshellarg($jarPath).(empty($args)?'':' '.$args);
@@ -195,6 +202,9 @@ abstract class BaseCommand extends ContainerAwareCommand
         fclose($pipes[1]);
     }
 
+    /**
+     * @return string
+     */
     private function locatePlovrConfig($inputStr)
     {
         if ('@' === $inputStr[0]) {
@@ -222,14 +232,10 @@ abstract class BaseCommand extends ContainerAwareCommand
     {
         $path = getenv('PATH') ? getenv('PATH') : getenv('Path');
         $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ? explode(PATH_SEPARATOR, getenv('PATHEXT')) : array('.exe', '.bat', '.cmd', '.com')) : array('');
-        foreach (array('java') as $cli)
-        {
-            foreach ($suffixes as $suffix)
-            {
-                foreach (explode(PATH_SEPARATOR, $path) as $dir)
-                {
-                    if (is_file($file = $dir.DIRECTORY_SEPARATOR.$cli.$suffix) && is_executable($file))
-                    {
+        foreach (array('java') as $cli) {
+            foreach ($suffixes as $suffix) {
+                foreach (explode(PATH_SEPARATOR, $path) as $dir) {
+                    if (is_file($file = $dir.DIRECTORY_SEPARATOR.$cli.$suffix) && is_executable($file)) {
                         return $file;
                     }
                 }

@@ -19,12 +19,10 @@
 namespace JMS\GoogleClosureBundle\Command;
 
 use Symfony\Component\Routing\RequestContext;
-use JMS\I18nRoutingBundle\Router\I18nRouter;
 use JMS\GoogleClosureBundle\Exception\RuntimeException;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
@@ -66,7 +64,7 @@ class BuildPlovrCommand extends BaseCommand
 
         if (!isset($config['locales'])) {
             $locales = array('en');
-        } else if (!is_array($config['locales'])) {
+        } elseif (!is_array($config['locales'])) {
             throw new RuntimeException('"locales" must be an array of strings.');
         } else {
             $locales = $config['locales'];
@@ -101,7 +99,7 @@ class BuildPlovrCommand extends BaseCommand
 
                 if ('MSG' === $match[1]) {
                     $localeConfig['define'][$k] = $translator->trans($v, array(), 'messages', $locale);
-                } else if ('ROUTE' === $match[1]) {
+                } elseif ('ROUTE' === $match[1]) {
                     $requestContext = new RequestContext();
                     $requestContext->setParameter('_locale', $locale);
                     $router->setContext($requestContext);

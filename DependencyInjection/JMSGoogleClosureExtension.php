@@ -44,6 +44,9 @@ class JMSGoogleClosureExtension extends Extension
         ;
     }
 
+    /**
+     * @return \Symfony\Component\Config\Definition\NodeInterface
+     */
     private function getConfigTree()
     {
         $tb = new TreeBuilder();
