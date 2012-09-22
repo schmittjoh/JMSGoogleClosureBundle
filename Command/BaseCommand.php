@@ -18,6 +18,8 @@
 
 namespace JMS\GoogleClosureBundle\Command;
 
+use Symfony\Component\Process\Process;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use JMS\GoogleClosureBundle\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -183,11 +185,16 @@ abstract class BaseCommand extends ContainerAwareCommand
         }
 
         $output->writeln(sprintf('Executing "%s"...', $cmd));
+        $proc = new Process($cmd);
         $h = proc_open($cmd, $descriptorspec = array(
             0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
             1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
             2 => array("pipe", "w") // stderr is a file to write to
         ), $pipes);
+
+        if ( ! is_resource($h)) {
+            throw new \RuntimeException(sprintf('Could not launch process "%s".', $cmd));
+        }
 
         fclose($pipes[0]);
 
