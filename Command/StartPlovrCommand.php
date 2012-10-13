@@ -34,7 +34,7 @@ class StartPlovrCommand extends BaseCommand
         $this
             ->setName('plovr:start')
             ->setDescription('Starts the Plovr server')
-            ->addArgument('config', InputArgument::REQUIRED, 'The configuration file to use')
+            ->addArgument('config', InputArgument::IS_ARRAY, 'The configuration file(s) to use')
         ;
 
         parent::configure();
@@ -44,10 +44,10 @@ class StartPlovrCommand extends BaseCommand
     {
         $javaBin = $this->locateJavaBin($input);
         $plovrJar = $this->locatePlovrJar($input);
-        $config = $this->loadPlovrConfig($input->getArgument('config'));
-        $path = $this->writeTempConfig($config);
+        $configPaths = $this->processPlovrConfig($input->getArgument('config'));
 
-        $this->runJar($output, $javaBin, $plovrJar, 'serve '.escapeshellarg($path));
-        unlink($path);
+        $this->runJar($output, $javaBin, $plovrJar, 'serve '.implode(' ', array_map('escapeshellarg', $configPaths)));
+
+        $this->cleanupPloverConfig($configPaths);
     }
 }

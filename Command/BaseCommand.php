@@ -65,6 +65,37 @@ abstract class BaseCommand extends ContainerAwareCommand
         return $config;
     }
 
+    /**
+     * Processes the plover config and generates a list of configuration files
+     * which can be safely passed to the plovr command line.
+     * 
+     * @param array $files Files 
+     * @return array
+     */
+    protected function processPlovrConfig($configs)
+    {
+        $configPaths = array();
+
+        foreach ($configs as $inputConfig) {
+            $config = $this->loadPlovrConfig($inputConfig);
+            $configPaths[] = $this->writeTempConfig($config);
+        }
+
+        return $configPaths;
+    }
+
+    /**
+     * Cleans up the config files gnerated in the running of the command
+     * 
+     * @param array $files Files to cleanup
+     */
+    protected function cleanupPlovrConfig($files)
+    {
+        foreach ($files as $file) {
+            unlink($file);
+        }
+    }
+
     protected function locateJavaBin(InputInterface $input)
     {
         $javaBin = $input->getOption('java-bin');
